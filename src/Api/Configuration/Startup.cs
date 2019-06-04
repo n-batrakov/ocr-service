@@ -16,6 +16,7 @@ namespace ITExpert.OcrService.Configuration
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAppDependencies(Configuration);
             services.AddMvcCore().AddJsonFormatters();
         }
 
