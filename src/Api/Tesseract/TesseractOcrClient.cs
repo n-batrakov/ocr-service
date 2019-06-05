@@ -57,12 +57,21 @@ namespace ITExpert.OcrService.Tesseract
 
         private async Task<string> WriteFileAsync(Stream image, CancellationToken token)
         {
+            if (!image.CanRead)
+            {
+                throw new ArgumentException("Stream is not readable.");
+            }
+            
             var fileName = Guid.NewGuid().ToString("N");
             var filePath = Path.Join(WorkingDirectory, fileName);
 
             using (var fileStream = File.Create(filePath))
             {
-                image.Seek(0, SeekOrigin.Begin);
+                if (image.CanSeek)
+                {
+                    image.Seek(0, SeekOrigin.Begin);                    
+                }
+                
                 await image.CopyToAsync(fileStream, token);
             }
 
