@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
+using ITExpert.OcrService.Exceptions;
 using ITExpert.OcrService.Middleware.ExceptionHandler;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,7 +23,11 @@ namespace ITExpert.OcrService.Configuration
         {
             services.AddAppDependencies(Configuration);
             services
-                .AddMvc()
+                .AddMvcCore()
+                .AddJsonFormatters(JsonConfiguration.Configure)
+                .AddDataAnnotations()
+                .AddFormatterMappings()
+                .AddApiExplorer()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -30,7 +36,8 @@ namespace ITExpert.OcrService.Configuration
             app.UseApiExceptionSerializer(options =>
             {
                 options.ShowStackTrace = env.IsDevelopment();
-                options.ConfigureException<UnsupportedMediaTypeException>(c => c.HttpStatusCode = 415);
+                options.ConfigureException<UnsupportedMediaTypeException>(c => c.HttpStatusCode = (int)HttpStatusCode.UnsupportedMediaType);
+                options.ConfigureException<BadRequestException>(c => c.HttpStatusCode = (int)HttpStatusCode.BadRequest);
             });
             app.UseMvc();
         }

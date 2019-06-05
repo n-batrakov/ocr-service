@@ -3,6 +3,7 @@ using ITExpert.OcrService.Core;
 using ITExpert.OcrService.Tesseract;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 
 namespace ITExpert.OcrService.Configuration
 {
@@ -18,6 +19,8 @@ namespace ITExpert.OcrService.Configuration
             Directory.CreateDirectory(tempDir);
             services.AddSingleton<IOcrClient>(new TesseractOcrClient(new TesseractOptions(tempDir, "tesseract")));
 
+            services.AddSingleton(JsonSerializer.Create(JsonConfiguration.Instance));
+            
             services.AddHttpClient();
             
             return services;
