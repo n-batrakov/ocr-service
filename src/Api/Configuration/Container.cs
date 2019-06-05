@@ -1,3 +1,4 @@
+using System.IO;
 using ITExpert.OcrService.Core;
 using ITExpert.OcrService.Tesseract;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +13,10 @@ namespace ITExpert.OcrService.Configuration
         {
             services.AddSingleton(NullImageProcessor.Instance);
             services.AddSingleton(NullPostProcessor.Instance);
-            services.AddSingleton<IOcrClient>(new TesseractOcrClient(new TesseractOptions(".", "tesseract")));
+
+            var tempDir = "../../tmp";
+            Directory.CreateDirectory(tempDir);
+            services.AddSingleton<IOcrClient>(new TesseractOcrClient(new TesseractOptions(tempDir, "tesseract")));
 
             services.AddHttpClient();
             
