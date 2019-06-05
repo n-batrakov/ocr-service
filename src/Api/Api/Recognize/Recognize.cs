@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -9,14 +9,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ITExpert.OcrService.Core;
+using ITExpert.OcrService.Exceptions;
+using Newtonsoft.Json;
+
 
 namespace ITExpert.OcrService.Api.Recognize
 {
-    public class RecognizeFromUrlRequest
+    public class NetImageOptions
     {
-        [Required]
         public string Uri { get; set; }
-
         public string Method { get; set; } = "GET";
         public IDictionary<string, string> Headers { get; set; }
         public string Body { get; set; }
@@ -39,24 +40,28 @@ namespace ITExpert.OcrService.Api.Recognize
         private IOcrClient OcrClient { get; }
         private ITextPostProcessor PostProcessor { get; }
         private IHttpClientFactory HttpClientFactory { get; }
+        private JsonSerializer Serializer { get; }
 
         public RecognizeFromUrlController(
             IImagePreProcessor preProcessor,
             IOcrClient ocrClient,
             ITextPostProcessor postProcessor,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            JsonSerializer serializer)
         {
             PreProcessor = preProcessor;
             OcrClient = ocrClient;
             PostProcessor = postProcessor;
             HttpClientFactory = httpClientFactory;
+            Serializer = serializer;
         }
 
         [HttpPost("v1/recognize")]
-        [Consumes("application/json"), Produces("application/json"), ProducesResponseType(200)]
-        public async Task<RecognizeResponse> ExecuteAsync(RecognizeFromUrlRequest request, CancellationToken token)
+        [Consumes("application/octet-stream", "application/json", "multipart/form-data")] 
+        [Produces("application/json"), ProducesResponseType(200)]
+        public async Task<RecognizeResponse> ExecuteAsync(CancellationToken token)
         {
-            var image = await ReadImageFromUrl(request, token).ConfigureAwait(false);
+            var image = await GetFileAsync(token);
             image = PreProcessor.Process(image);
             var ocrResult = await OcrClient.RecognizeAsync(image, token).ConfigureAwait(false);
 
@@ -72,7 +77,53 @@ namespace ITExpert.OcrService.Api.Recognize
             }
         }
 
-        private async Task<Stream> ReadImageFromUrl(RecognizeFromUrlRequest options, CancellationToken token)
+        private Task<Stream> GetFileAsync(CancellationToken token)
+        {
+            var contentType = MediaTypeHeaderValue.Parse(Request.ContentType);
+
+            switch (contentType.MediaType)
+            {
+                case "application/octet-stream":
+                    return Task.FromResult(Request.Body);
+                case "multipart/form-data":
+                    return HandleFormInputAsync(token);
+                case "application/json":
+                    return HandleJsonInputAsync(token);
+                default:
+                    throw new UnsupportedMediaTypeException(
+                        $"Content-Type header MUST be set to 'application/octet-stream', 'multipart/form-data' or 'application/json', but '{contentType}' received.",
+                        contentType);
+            }
+        }
+
+        private async Task<Stream> HandleFormInputAsync(CancellationToken token)
+        {
+            var form = await Request.ReadFormAsync(token).ConfigureAwait(false);
+
+            if (form.Files.Count == 0 || form.Files.Count > 1)
+            {
+                throw new BadRequestException($"Form-Data MUST contain exactly one image file, but got {form.Files.Count}.");
+            }
+            
+            return form.Files.First().OpenReadStream();
+        }
+        
+        private async Task<Stream> HandleJsonInputAsync(CancellationToken token)
+        {
+            using (var sw = new StreamReader(Request.Body))
+            {
+                var options = (NetImageOptions)Serializer.Deserialize(sw, typeof(NetImageOptions));
+
+                if (string.IsNullOrEmpty(options.Uri))
+                {
+                    throw new BadRequestException("application/json payload MUST contain 'url' property.");
+                }
+                
+                return await ReadImageFromUrl(options, token).ConfigureAwait(false);
+            }
+        }
+
+        private async Task<Stream> ReadImageFromUrl(NetImageOptions options, CancellationToken token)
         {
             var client = HttpClientFactory.CreateClient();
 
