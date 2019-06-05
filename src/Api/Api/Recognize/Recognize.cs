@@ -33,7 +33,7 @@ namespace ITExpert.OcrService.Api.Recognize
     }
     
     [ApiController]
-    public class RecognizeFromUrlController : Controller
+    public class RecognizeFromUrlController : ControllerBase
     {
         private IImagePreProcessor PreProcessor { get; }
         private IOcrClient OcrClient { get; }
@@ -53,7 +53,8 @@ namespace ITExpert.OcrService.Api.Recognize
         }
 
         [HttpPost("v1/recognize")]
-        public async Task<RecognizeResponse> ExecuteAsync([FromBody] RecognizeFromUrlRequest request, CancellationToken token)
+        [Consumes("application/json"), Produces("application/json"), ProducesResponseType(200)]
+        public async Task<RecognizeResponse> ExecuteAsync(RecognizeFromUrlRequest request, CancellationToken token)
         {
             var image = await ReadImageFromUrl(request, token).ConfigureAwait(false);
             image = PreProcessor.Process(image);
@@ -79,7 +80,7 @@ namespace ITExpert.OcrService.Api.Recognize
             {
                 RequestUri = new Uri(options.Uri),
                 Method = new HttpMethod(options.Method),
-                Content = options.Body == null ? null : new StringContent(options.Body, Encoding.UTF8),
+                Content = options.Body == null ? null : new StringContent(options.Body, Encoding.UTF8)
             };
             if (options.Headers != null)
             {
@@ -90,10 +91,17 @@ namespace ITExpert.OcrService.Api.Recognize
             var response = await client.SendAsync(request, token);
 
             response.EnsureSuccessStatusCode();
+
+            var contentType = response.Content.Headers.ContentType;
+            if (contentType.MediaType.StartsWith("image"))
+            {
+                return await response.Content.ReadAsStreamAsync();                
+            }
+            else
+            {
+                throw new UnsupportedMediaTypeException($"Provided URL must return image/* content, but {contentType} received.", contentType);
+            }
             
-            // TODO: handle response by content-type
-            
-            throw new NotImplementedException();
         }
 
         private static void CopyHeaders(IDictionary<string, string> source, HttpHeaders destination)
