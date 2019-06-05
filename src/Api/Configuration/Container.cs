@@ -1,6 +1,6 @@
 using System.IO;
 using ITExpert.OcrService.Core;
-using ITExpert.OcrService.Tesseract;
+using ITExpert.OcrService.Implementations.Tesseract;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;

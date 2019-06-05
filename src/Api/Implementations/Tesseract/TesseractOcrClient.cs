@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using CliWrap;
 using ITExpert.OcrService.Core;
 
-namespace ITExpert.OcrService.Tesseract
+namespace ITExpert.OcrService.Implementations.Tesseract
 {
     public class TesseractOcrClient : IOcrClient
     {

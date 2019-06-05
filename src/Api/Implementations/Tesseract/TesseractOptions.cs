@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ITExpert.OcrService.Tesseract
+namespace ITExpert.OcrService.Implementations.Tesseract
 {
     public class TesseractOptions
     {
