@@ -5,32 +5,29 @@ using Xunit.Sdk;
 
 namespace UnitTests
 {
-    public class CallbackProcessor : ITextPostProcessor
-    {
-        private Func<string, string> Callback { get; }
-        
-        public CallbackProcessor(Func<string, string> callback)
-        {
-            Callback = callback;
-        }
-        
-        public string Process(string text)
-        {
-            return Callback(text);
-        }
-    }
-
     public class PerWordProcessorTests
     {
-        private PerWordProcessor Sut(Func<string, string> fn) =>
+        private static PerWordProcessor Sut(Func<string, string> fn) =>
             new PerWordProcessor(new[] {new CallbackProcessor(fn)});
+
+        [Fact]
+        public void CanProcessEmptyString()
+        {
+            var sut = Sut(x => throw new TestException());
+            
+            var expected = "";
+
+            var actual = sut.Process("");
+            
+            Assert.Equal(expected, actual);
+        }
         
         [Fact]
         public void CanProcessSingleWord()
         {
-            var expected = "Foo";
+            var expected = "test";
             
-            var actual = Sut(x => x).Process(expected);
+            var actual = Sut(x => x).Process("test");
             
             Assert.Equal(expected, actual);
         }
@@ -38,7 +35,7 @@ namespace UnitTests
         [Fact]
         public void CanProcessTextWithNoWords()
         {
-            var sut = Sut(_ => throw new XunitException("Processor was not expected to be called."));
+            var sut = Sut(_ => throw new TestException());
             
             var expected = ";,,#!";
             var actual = sut.Process(expected);
@@ -47,15 +44,47 @@ namespace UnitTests
         }
 
         [Fact]
-        public void CanProcessMultiWordText()
+        public void CanProcessSentences()
         {
             var sut = Sut(_ => "test");
 
-            var expected = "test, test. test!";
+            var expected = "test, test, test";
 
-            var actual = sut.Process("One, two. Three!");
+            var actual = sut.Process("one, two, three");
             
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanProcessSentencesNonWordStart()
+        {
+            var sut = Sut(_ => "test");
+
+            var expected = "%# test,test,test";
+
+            var actual = sut.Process("%# One,Two,Three");
+            
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanProcessSentencesNonWordEnd()
+        {
+            var sut = Sut(_ => "test");
+
+            var expected = "test,test,test %#";
+
+            var actual = sut.Process("One,Two,Three %#");
+            
+            Assert.Equal(expected, actual);
+        }
+
+        private class TestException : XunitException
+        {
+            public TestException(): base("Processor was not expected to be called.")
+            {
+                
+            }
         }
     }
 }
