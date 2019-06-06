@@ -1,7 +1,7 @@
 using System;
-using ITExpert.OcrService.Core;
+using OcrService.Core;
 
-namespace UnitTests
+namespace OcrService.Implementations.TextProcessors
 {
     public class CallbackProcessor : ITextPostProcessor
     {

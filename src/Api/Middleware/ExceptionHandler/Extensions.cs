@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace ITExpert.OcrService.Middleware.ExceptionHandler
+namespace OcrService.Middleware.ExceptionHandler
 {
     public static class UseExceptionHandlerExtension
     {

@@ -1,9 +1,9 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ITExpert.OcrService.Core;
+using OcrService.Core;
 
-namespace ITExpert.OcrService.Implementations
+namespace OcrService.Implementations
 {
     public class FakeOcr : IOcrClient
     {

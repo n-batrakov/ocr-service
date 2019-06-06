@@ -1,8 +1,8 @@
 using System;
 using System.Text.RegularExpressions;
-using ITExpert.OcrService.Core;
+using OcrService.Core;
 
-namespace ITExpert.OcrService.Implementations.TextProcessors
+namespace OcrService.Implementations.TextProcessors
 {
     public enum NormalizeLineEndingsStrategy
     {

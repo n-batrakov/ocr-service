@@ -2,7 +2,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ITExpert.OcrService.Core
+namespace OcrService.Core
 {
     public enum OcrStatus
     {
@@ -31,5 +31,15 @@ namespace ITExpert.OcrService.Core
     public interface IOcrClient
     {
         Task<OcrResult> RecognizeAsync(Stream image, CancellationToken token);
+    }
+
+    public interface IImagePreProcessor
+    {
+        Stream Process(Stream stream);
+    }
+    
+    public interface ITextPostProcessor
+    {
+        string Process(string text);
     }
 }

@@ -1,8 +1,8 @@
-﻿using ITExpert.OcrService.Configuration;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using OcrService.Configuration;
 
-namespace ITExpert.OcrService
+namespace OcrService
 {
     public static class Program
     {

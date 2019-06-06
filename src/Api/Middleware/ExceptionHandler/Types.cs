@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ITExpert.OcrService.Middleware.ExceptionHandler
+namespace OcrService.Middleware.ExceptionHandler
 {
     /// <summary>
     /// Exception specific configuration options.

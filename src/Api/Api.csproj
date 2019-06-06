@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
-    <RootNamespace>ITExpert.OcrService</RootNamespace>
+    <RootNamespace>OcrService</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

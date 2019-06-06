@@ -1,18 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ITExpert.OcrService.Core;
+using OcrService.Core;
 
-namespace ITExpert.OcrService.Implementations.SymSpellTextProcessor
+namespace OcrService.Implementations.TextProcessors
 {
-    public class CleanupTextProcessor : ITextPostProcessor
-    {
-        public string Process(string text)
-        {
-            return text;
-        }
-    }
-
     public class SymSpellProcessor : ITextPostProcessor
     {
         private HashSet<string> IgnoreWords { get; }

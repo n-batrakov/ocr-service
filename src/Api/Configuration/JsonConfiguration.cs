@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
-namespace ITExpert.OcrService.Configuration
+namespace OcrService.Configuration
 {
     public static class JsonConfiguration
     {

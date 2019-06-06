@@ -1,4 +1,4 @@
-namespace ITExpert.OcrService.Implementations.Tesseract
+namespace OcrService.Implementations.Tesseract
 {
     public enum TesseractPageSegmentation
     {

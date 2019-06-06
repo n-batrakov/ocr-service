@@ -1,14 +1,14 @@
 ﻿using System.Net;
 using System.Net.Http;
-using ITExpert.OcrService.Exceptions;
-using ITExpert.OcrService.Middleware.ExceptionHandler;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OcrService.Api;
+using OcrService.Middleware.ExceptionHandler;
 
-namespace ITExpert.OcrService.Configuration
+namespace OcrService.Configuration
 {
     public class Startup
     {

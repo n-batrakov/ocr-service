@@ -1,6 +1,6 @@
 using System;
 
-namespace ITExpert.OcrService.Exceptions
+namespace OcrService.Api
 {
     public class BadRequestException : Exception
     {

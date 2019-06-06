@@ -1,5 +1,4 @@
-using ITExpert.OcrService.Implementations.SymSpellTextProcessor;
-using ITExpert.OcrService.Implementations.TextProcessors;
+using OcrService.Implementations.TextProcessors;
 using Xunit;
 
 namespace UnitTests

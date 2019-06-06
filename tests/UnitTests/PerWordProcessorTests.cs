@@ -1,5 +1,5 @@
 using System;
-using ITExpert.OcrService.Core;
+using OcrService.Implementations.TextProcessors;
 using Xunit;
 using Xunit.Sdk;
 

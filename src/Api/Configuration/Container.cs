@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
-using ITExpert.OcrService.Core;
-using ITExpert.OcrService.Implementations;
-using ITExpert.OcrService.Implementations.SymSpellTextProcessor;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using OcrService.Core;
+using OcrService.Implementations;
+using OcrService.Implementations.ImageProcessors;
+using OcrService.Implementations.TextProcessors;
 
-namespace ITExpert.OcrService.Configuration
+namespace OcrService.Configuration
 {
     public static class Container
     {
@@ -47,12 +48,19 @@ namespace ITExpert.OcrService.Configuration
                 symSpell.LoadDictionary("../../ru.dict", termIndex: 0, countIndex: 1);
             }
             Console.Out.WriteLine("SymSpell initialized!");
-            
-            var symSpellProcessor = new SymSpellProcessor(symSpell, 1, Enumerable.Empty<string>());
-            
-            var postProcessor = PostProcessor.Combine(
-                new CleanupTextProcessor(),
-                PostProcessor.WordProcessors(symSpellProcessor));
+
+            var postProcessor = new CombinedProcessor(new ITextPostProcessor[]
+            {
+                new RemoveEmptyLinesProcessor(new RemoveEmptyLinesOptions
+                {
+                    NormalizeLineEndings = NormalizeLineEndingsStrategy.Lf
+                }),
+                
+                new PerWordProcessor(new ITextPostProcessor[]
+                {
+                    new SymSpellProcessor(symSpell, 1, Enumerable.Empty<string>())
+                })
+            });
             
             services.AddSingleton(postProcessor);
         }

@@ -8,12 +8,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using ITExpert.OcrService.Core;
-using ITExpert.OcrService.Exceptions;
 using Newtonsoft.Json;
+using OcrService.Core;
 
-
-namespace ITExpert.OcrService.Api.Recognize
+namespace OcrService.Api.Recognize
 {
     public class NetImageOptions
     {
